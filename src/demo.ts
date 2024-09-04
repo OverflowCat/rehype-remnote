@@ -7,9 +7,9 @@ const fastify = f({
 });
 
 fastify.get("/", function (request, reply) {
-    let html = render();
+  let html = render();
 
-    return reply.code(200).type("text/html").send(`
+  return reply.code(200).type("text/html").send(`
       <!DOCTYPE html>
       <html>
       <head>
@@ -97,6 +97,10 @@ span.cloze input + label + label {
   display: none;
   cursor: zoom-out;
 }
+
+pre.math-display:not(:only-child) {
+  display: inline-block;
+}
         </style>
         </head>
       <body class="rem">
@@ -106,16 +110,16 @@ span.cloze input + label + label {
     </div>
     </body>
     </html>`);
-  });
+});
 
-  // Run the server and report out to the logs
-  fastify.listen(
-    { port: 3119, host: "0.0.0.0" },
-    function (err, address) {
-      if (err) {
-        console.error(err);
-        process.exit(1);
-      }
-      console.log(`Your app is listening on ${address}`);
+// Run the server and report out to the logs
+fastify.listen(
+  { port: 3117, host: "0.0.0.0" },
+  function (err, address) {
+    if (err) {
+      console.error(err);
+      process.exit(1);
     }
-  );
+    console.log(`Your app is listening on ${address}`);
+  }
+);

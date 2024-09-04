@@ -1,8 +1,16 @@
 import { toHtml } from 'hast-util-to-html'
 import { h } from "hastscript";
+import {
+  /// @type {Workspace}
+  workspace
+} from "../rem.js";
 
-const docMap = new Map();
-import { workspace } from "../rem.js";
+type TDoc = {
+  val: Doc;
+  ch: TDoc[];
+};
+
+const docMap = new Map<DocId, TDoc>();
 const docs = workspace.docs;
 const typeMap = new Map();
 for (const doc of docs) {
@@ -34,21 +42,21 @@ for (const doc of docs) {
   }
 }
 
-const root = docMap.get(workspace.documentRemToExportId);
+const root = docMap.get(workspace.documentRemToExportId)!;
 
 const stringTimes = (str: string, n: number) => Array(n).fill(str).join("");
 
-export function printDoc(doc, depth = 0) {
+export function printDoc(doc: TDoc, depth = 0) {
   const node = h("")
-  if (doc.val.key.at(0)?.i === "i") {
+  if (doc.val.key.at(0)['i'] === "i") {
     // remove "blocks" from it
-    doc.val.key.at(0).blocks = undefined;
-    doc.val.key.at(0).textData = undefined;
+    doc.val.key.at(0)['blocks'] = undefined;
+    doc.val.key.at(0)['textData'] = undefined;
   }
-  if (doc.val.value?.i === "i") {
+  if (doc.val.value['i'] === "i") {
     // remove "blocks" from it
-    doc.val.value.blocks = undefined;
-    doc.val.value.textData = undefined;
+    doc.val.value['blocks'] = undefined;
+    doc.val.value['textData'] = undefined;
   }
   const res = doc.val.value ? doc.val.key.concat(doc.val.value) : doc.val.key;
   console.log(stringTimes("= ", depth), JSON.stringify(res));
@@ -62,36 +70,51 @@ const listIds = new Set(
   typeMap.get("List Item")?.typeChildren || []
 );
 
-import { m, wrap } from "./item.js";
-
+import { m } from "./item.js";
+import { groupChildren } from './ordered.js';
+import { datanames } from './util.js';
 type HastNode = ReturnType<typeof h>;
 
-export function transformDoc(doc: any): HastNode | undefined {
-  const { key, value, _id } = doc.val;
-  let front = [], back = [];
-  if (!key || key.length === 1 && key.at(0).i === 'q') {
+export function transformDoc(tdoc: TDoc): HastNode | undefined {
+  const doc = tdoc.val;
+  if (!doc?.key || doc?.key.length === 1 && doc.key.at(0)['i'] === 'q') {
+    // console.log("Skipping", tdoc);
     return;
   }
+  const { key, value, _id } = doc;
+  let front = [], back = [];
   if (key)
     front = key.map(m).filter((x: any) => x !== undefined);
   if (value)
     back = value.map(m).filter((x: any) => x !== undefined);
 
-  const children = (doc.ch as Array<any>).map(transformDoc).filter(Boolean);
+  const children = (doc.ch as Array<any>).map(x => docMap.get(x)).map(transformDoc).filter(Boolean);
   const thisCard = back?.length > 0 ? front.concat(
-    [h('span', { class: "card-arrow" }, "→")], back
-  ) : front;
-  const thisProps = { id: _id, title: JSON.stringify(doc) };
-  if (children && children.length > 0) {
-    const filtered = children.filter(c => listIds.has(c.properties.id));
-    const listTag = filtered.length > 0 ? "ol" : 'ul';
-    return h('details', { open: true }, [
+    [h('span', { class: "card-arrow" }, doc.enableBackSR ? "←" : "→")], back
+  ) : front.concat(doc['forget'] !== undefined ? [h('span', { class: "card-arrow" }, "↓")] : []);
+
+  if (!thisCard.length) return undefined;
+
+  const thisProps = {
+    id: _id,
+    // title: JSON.stringify(doc)
+  };
+  const data = "crt" in doc && doc.crt ? {
+    "ordered": Boolean(doc.crt['i']),
+    "answer": Boolean(doc.crt['a']),
+  } : {};
+  console.log("Data", data);
+  if (!children.length) {
+    var node = h('div', thisProps, thisCard);
+  } else {
+    const groupedChildren = groupChildren(children);
+    groupedChildren.length > 1 && console.log("Grouped children", groupedChildren);
+    var node = h('details', { open: true }, [
       h('summary', thisProps, thisCard),
-      h(listTag, children.map(x => wrap(x, "li")))
+      ...groupedChildren,
     ]);
   }
-  if (!thisCard.length) return undefined;
-  return h('div', thisProps, thisCard);
+  return datanames(node, data);
 }
 
 export function render() {
@@ -99,4 +122,4 @@ export function render() {
   return toHtml(hTree);
 }
 
-// console.log(render());
+console.log(render());

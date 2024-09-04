@@ -17,6 +17,30 @@ type BaseEle = { // RemNote rich text segment
     /** cloze id */
     cId?: string;
     qId?: string;
+    crt?: {
+        /** Ordered List item */
+        i?: {};
+        /** Card item */
+        w?: {};
+        /** Quoteblock */
+        qt?: {};
+        r?: {
+            s: any;
+        }
+        /** Link? */
+        a?: {};
+        /** Link? */
+        z?: {};
+        b?: {
+            u?: any;
+        }
+        /** Document */
+        o?: {
+            s?: any;
+        }
+    } | null;
+    "crt,u"?: number;
+    "crt,o"?: number;
 } | string;
 
 type ImageSet = {
@@ -51,6 +75,16 @@ type TypeDoc = {
     key: [RemTypes],
     typeChildren: DocId[] | never[],
     parent: null,
+    rcrt: string,
+    "rcrt,u": number,
+    crt?: {
+        /** Automatically Sort */
+        g?: {},
+        /** Daily Documents */
+        o?: {
+            s?: any;
+        }
+    }
 }
 
 type Ele = AllOrNones<BaseEle, [ImageSet, MathSet]>;
@@ -65,13 +99,26 @@ type ExpandToAllOrNoneHelper<T, U> = U extends [infer F, ...infer R]
 
 type AllOrNones<T, U extends any[]> = ExpandToAllOrNoneHelper<T, U>;
 
+type Workspace = {
+    userId: string;
+    knowledgebaseId: string;
+    name: string;
+    exportDate: string;
+    exportVersion: number;
+    documentRemToExportId: string;
+    docs: Doc[];
+}
+
 type Doc = ({
-    key: Ele[];
     value?: Ele[];
     _id: DocId;
 } | TypeDoc) & {
-    m?: number;
+    m: number;
+    key: Ele[];
+    "key,u"?: number;
     createdAt: number;
+    enableBackSR?: boolean;
+    "enableBackSR,u"?: number;
     v: number;
     parent: DocId;
     n: number;
@@ -84,7 +131,11 @@ type Doc = ({
     u: number;
     k: string;
     /** AI generated card prompt */
-    ai?: any;
+    ai?: {
+        def: string;
+        lines: string[];
+    };
+    "ai,u"?: number;
     ic?: boolean;
     di: DocId[];
     ch: Doc[];
