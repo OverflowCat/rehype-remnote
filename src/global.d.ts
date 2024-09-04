@@ -1,5 +1,42 @@
 type DocId = string;
 
+type Crt = {
+    /** Ordered List item */
+    i?: {};
+    /** Card item */
+    w?: {};
+    /** Quoteblock */
+    qt?: {};
+    /** Right side Image */
+    im?: {
+        i: {
+            _id: string;
+            v: {
+                i: "i";
+                width: number;
+                height: number;
+                /** URL */
+                s: string;
+            }[];
+            s: string;
+        }
+    }
+    r?: {
+        s: any;
+    }
+    /** Link? */
+    a?: {};
+    /** Link? */
+    z?: {};
+    b?: {
+        u?: any;
+    }
+    /** Document */
+    o?: {
+        s?: any;
+    }
+}
+
 type BaseEle = { // RemNote rich text segment
     text?: string;
     /**
@@ -17,30 +54,6 @@ type BaseEle = { // RemNote rich text segment
     /** cloze id */
     cId?: string;
     qId?: string;
-    crt?: {
-        /** Ordered List item */
-        i?: {};
-        /** Card item */
-        w?: {};
-        /** Quoteblock */
-        qt?: {};
-        r?: {
-            s: any;
-        }
-        /** Link? */
-        a?: {};
-        /** Link? */
-        z?: {};
-        b?: {
-            u?: any;
-        }
-        /** Document */
-        o?: {
-            s?: any;
-        }
-    } | null;
-    "crt,u"?: number;
-    "crt,o"?: number;
 } | string;
 
 type ImageSet = {
@@ -113,6 +126,9 @@ type Doc = ({
     value?: Ele[];
     _id: DocId;
 } | TypeDoc) & {
+    crt?: Crt | null;
+    "crt,u"?: number;
+    "crt,o"?: number;
     m: number;
     key: Ele[];
     "key,u"?: number;

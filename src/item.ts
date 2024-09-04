@@ -26,12 +26,12 @@ export function m(ele: Ele): Child | undefined {
   if (typeof ele === "string") {
     return t(ele);
   }
-  if (!ele.text) return undefined;
 
   // rich text
-  let tree: Child = t(ele.text);
+  let tree: Child;
   if (ele.i === 'x') {
     const { block, latexClozes, text } = ele;
+    tree = t(text);
     // https://www.npmjs.com/package/remark-math
     if (block) {
       tree = classnames(h("pre",
@@ -40,6 +40,16 @@ export function m(ele: Ele): Child | undefined {
     } else {
       tree = h("code", { class: "language-math math-inline" }, tree);
     }
+  } else if (ele.i === 'i') {
+    // img
+    const title = ele.title || "";
+    const { url, width, height } = ele;
+    tree = h("img", { src: url, alt: title, width, height });
+    console.log("Image", tree);
+  } else {
+    // text
+    if (!ele.text) return;
+    tree = t(ele.text);
   }
 
   if (ele.b) {
@@ -61,12 +71,6 @@ export function m(ele: Ele): Child | undefined {
   if (ele.h) {
     // highlight color, can be number (1, 2, 3) or hex string (#ff0000)
     tree = cls(tree, `bg-${mapColor(ele.h, 300)}`);
-  }
-  if (ele.url) {
-    // img
-    const title = ele.title || "";
-    const { url, width, height } = ele;
-    tree = h("img", { src: url, alt: title, width, height });
   }
   if (ele.qId) {
     // url

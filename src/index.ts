@@ -1,5 +1,5 @@
 import { toHtml } from 'hast-util-to-html'
-import { h } from "hastscript";
+import { Child, h } from "hastscript";
 import {
   /// @type {Workspace}
   workspace
@@ -75,14 +75,17 @@ import { groupChildren } from './ordered.js';
 import { datanames } from './util.js';
 type HastNode = ReturnType<typeof h>;
 
+let counter = 0;
+
 export function transformDoc(tdoc: TDoc): HastNode | undefined {
+  counter++;
+  console.log(counter + " / " + docMap.size);
   const doc = tdoc.val;
   if (!doc?.key || doc?.key.length === 1 && doc.key.at(0)['i'] === 'q') {
-    // console.log("Skipping", tdoc);
     return;
   }
   const { key, value, _id } = doc;
-  let front = [], back = [];
+  let front: Child[] = [], back: Child[] = [];
   if (key)
     front = key.map(m).filter((x: any) => x !== undefined);
   if (value)
@@ -103,14 +106,27 @@ export function transformDoc(tdoc: TDoc): HastNode | undefined {
     "ordered": Boolean(doc.crt['i']),
     "answer": Boolean(doc.crt['a']),
   } : {};
-  console.log("Data", data);
+  // @ts-ignore
+  if (doc.crt) {
+    const crt = doc.crt as Crt;
+    if (crt.im?.i.v.length) {
+      const { width, height } = crt['im'].i.v[0];
+      const tree = h("img.float-end.inline-block", {
+        src: crt.im.i.s,
+        width,
+        height,
+      });
+      thisCard.unshift(tree);
+    }
+  }
+  let node: HastNode;
   if (!children.length) {
-    var node = h('div', thisProps, thisCard);
+    node = h('div', thisProps, ...thisCard);
   } else {
     const groupedChildren = groupChildren(children);
-    groupedChildren.length > 1 && console.log("Grouped children", groupedChildren);
-    var node = h('details', { open: true }, [
-      h('summary', thisProps, thisCard),
+    // groupedChildren.length > 1 && console.log("Grouped children", groupedChildren);
+    node = h('details', { open: !doc.ic }, [
+      h('summary', thisProps, ...thisCard),
       ...groupedChildren,
     ]);
   }
@@ -122,4 +138,4 @@ export function render() {
   return toHtml(hTree);
 }
 
-console.log(render());
+render()
