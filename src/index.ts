@@ -161,28 +161,26 @@ export const DEFAULT_CONFIG: XformConfig = {
 };
 
 export function hydrate(workspace: Workspace) {
-  const [_, docMap] = parseRems(workspace);
-  const result = {
-    documentRemToExportId: workspace.documentRemToExportId,
-    docs: Array.from(docMap.values()).map((x) => {
-      // delete all "***,u" keys from x.val
-      if (x.val) {
-        if (x.val.portalsIn) return false;
-        for (const key in x.val) {
-          if (/^k,|,[ou]$/.test(key)) {
-            delete x.val[key];
-          }
-        }
-        delete x.val.createdAt;
-        delete x.val.owner;
-        delete x.val.k;
-        delete x.val.f;
-        return x;
-      }
+  const [root] = parseRems(workspace);
+  function simplify(x: TDoc) {
+    // delete all "***,u" keys from x.val
+    if (!x.val) {
       return false;
-    }).filter(Boolean),
-  };
-  return result;
+    }
+    if (x.val.portalsIn) return false;
+    for (const key in x.val) {
+      if (/^k,|,[ou]$/.test(key)) {
+        delete x.val[key];
+      }
+    }
+    delete x.val.createdAt;
+    delete x.val.owner;
+    delete x.val.k;
+    delete x.val.f;
+    x.ch = x.ch.map(simplify).filter(Boolean);
+    return x;
+  }
+  return simplify(root);
 }
 
 export function rem2Hast(workspace: Workspace, config = DEFAULT_CONFIG) {
