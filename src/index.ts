@@ -1,62 +1,22 @@
-import { toHtml } from 'hast-util-to-html'
-import { Child, h } from "hastscript";
-import {
-  /// @type {Workspace}
-  workspace
-} from "../rem.js";
+import { type Child, h } from "hastscript";
 
-type TDoc = {
-  val: Doc;
-  ch: TDoc[];
-};
+import { m } from "./item.js";
+import { groupChildren } from "./ordered.js";
+import { datanames } from "./util.js";
+import { toHtml } from "hast-util-to-html";
+export type HastNode = ReturnType<typeof h>;
 
-const docMap = new Map<DocId, TDoc>();
-const docs = workspace.docs;
-const typeMap = new Map();
-for (const doc of docs) {
-  const id = doc._id;
-  const docObj = docMap.get(id);
-  if (docObj) {
-    docObj.val = doc;
-  } else {
-    docMap.set(id, {
-      val: doc,
-      ch: [],
-    });
-  }
-  let thisDoc = docMap.get(id);
-
-  if (doc.parent) {
-    const parent = docMap.get(doc.parent);
-    if (parent) {
-      parent.ch.push(thisDoc);
-    } else {
-      docMap.set(doc.parent, {
-        val: undefined,
-        ch: [thisDoc],
-      });
-    }
-  } else {
-    // console.log(`No parent for ${id}: ${doc.key}`);
-    typeMap.set(doc.key.at(0), doc);
-  }
-}
-
-const root = docMap.get(workspace.documentRemToExportId)!;
-
-const stringTimes = (str: string, n: number) => Array(n).fill(str).join("");
-
+/** Helper function for debug */
 export function printDoc(doc: TDoc, depth = 0) {
-  const node = h("")
-  if (doc.val.key.at(0)['i'] === "i") {
+  if (doc.val.key.at(0)["i"] === "i") {
     // remove "blocks" from it
-    doc.val.key.at(0)['blocks'] = undefined;
-    doc.val.key.at(0)['textData'] = undefined;
+    doc.val.key.at(0)["blocks"] = undefined;
+    doc.val.key.at(0)["textData"] = undefined;
   }
-  if (doc.val.value['i'] === "i") {
+  if (doc.val.value["i"] === "i") {
     // remove "blocks" from it
-    doc.val.value['blocks'] = undefined;
-    doc.val.value['textData'] = undefined;
+    doc.val.value["blocks"] = undefined;
+    doc.val.value["textData"] = undefined;
   }
   const res = doc.val.value ? doc.val.key.concat(doc.val.value) : doc.val.key;
   console.log(stringTimes("= ", depth), JSON.stringify(res));
@@ -66,51 +26,113 @@ export function printDoc(doc: TDoc, depth = 0) {
   }
 }
 
-const listIds = new Set(
-  typeMap.get("List Item")?.typeChildren || []
-);
+const stringTimes = (str: string, n: number) => Array(n).fill(str).join("");
 
-import { m } from "./item.js";
-import { groupChildren } from './ordered.js';
-import { datanames } from './util.js';
-type HastNode = ReturnType<typeof h>;
+export function parseRems(workspace: Workspace): [TDoc, DocMap] {
+  const docMap: DocMap = new Map();
+  const docs = workspace.docs;
+  const typeMap = new Map();
+  for (const doc of docs) {
+    const id = doc._id;
+    const docObj = docMap.get(id);
+    if (docObj) {
+      docObj.val = doc;
+    } else {
+      docMap.set(id, {
+        val: doc,
+        ch: [],
+      });
+    }
 
-let counter = 0;
+    const thisDoc = docMap.get(id);
 
-export function transformDoc(tdoc: TDoc): HastNode | undefined {
-  counter++;
-  console.log(counter + " / " + docMap.size);
+    if (doc.parent) {
+      const parent = docMap.get(doc.parent);
+      if (parent) {
+        parent.ch.push(thisDoc);
+      } else {
+        docMap.set(doc.parent, {
+          val: undefined,
+          ch: [thisDoc],
+        });
+      }
+    } else {
+      // console.log(`No parent for ${id}: ${doc.key}`);
+      typeMap.set(doc.key.at(0), doc);
+    }
+  }
+
+  const root = docMap.get(workspace.documentRemToExportId)!;
+  return [root, docMap];
+}
+
+export function transformDoc(
+  tdoc: TDoc,
+  docMap: DocMap,
+  config: XformConfig,
+  level = 0
+): HastNode | undefined {
+  if (config.docHook) {
+    console.log('hook')
+    const [_tdoc, _docMap] = config.docHook(tdoc, docMap, level);
+    tdoc = _tdoc;
+    docMap = _docMap;
+  }
   const doc = tdoc.val;
-  if (!doc?.key || doc?.key.length === 1 && doc.key.at(0)['i'] === 'q') {
+  if (!doc?.key || (doc?.key.length === 1 && doc.key.at(0)["i"] === "q")) {
     return;
   }
   const { key, value, _id } = doc;
-  let front: Child[] = [], back: Child[] = [];
+  let front: Child[] = [],
+    back: Child[] = [];
   if (key)
-    front = key.map(m).filter((x: any) => x !== undefined);
+    front = key.map((e) => m(e, config)).filter((x: any) => x !== undefined);
   if (value)
-    back = value.map(m).filter((x: any) => x !== undefined);
+    back = value.map((e) => m(e, config)).filter((x: any) => x !== undefined);
 
-  const children = (doc.ch as Array<any>).map(x => docMap.get(x)).map(transformDoc).filter(Boolean);
-  const thisCard = back?.length > 0 ? front.concat(
-    [h('span', { class: "card-arrow" }, doc.enableBackSR ? "←" : "→")], back
-  ) : front.concat(doc['forget'] !== undefined ? [h('span', { class: "card-arrow" }, "↓")] : []);
+  const children = (doc.ch as Array<any>)
+    .map((x) => docMap.get(x))
+    .filter(Boolean)
+    .map((x) => transformDoc(x, docMap, config, level + 1))
+    .filter(Boolean);
+  const thisCard =
+    back?.length > 0
+      ? front.concat(
+          [h("span", { class: "card-arrow" }, doc.enableBackSR ? "←" : "→")],
+          back
+        )
+      : front.concat(
+          doc["forget"] !== undefined
+            ? [h("span", { class: "card-arrow" }, "↓")]
+            : []
+        );
 
   if (!thisCard.length) return undefined;
 
   const thisProps = {
     id: _id,
-    // title: JSON.stringify(doc)
   };
-  const data = "crt" in doc && doc.crt ? {
-    "ordered": Boolean(doc.crt['i']),
-    "answer": Boolean(doc.crt['a']),
-  } : {};
+  if (config.debug) {
+    Object.defineProperty(thisProps, "title", {
+      value: JSON.stringify(doc),
+      enumerable: true,
+      writable: false,
+    })
+  }
+
+  const data: Record<string, string | boolean> =
+    "crt" in doc && doc.crt
+      ? {
+          ordered: Boolean(doc.crt["i"]),
+          answer: Boolean(doc.crt["a"]),
+          folder: Boolean(doc.crt?.o?.f),
+        }
+      : {};
   // @ts-ignore
   if (doc.crt) {
     const crt = doc.crt as Crt;
     if (crt.im?.i.v.length) {
-      const { width, height } = crt['im'].i.v[0];
+      const { width, height } = crt["im"].i.v[0];
       const tree = h("img.float-end.inline-block", {
         src: crt.im.i.s,
         width,
@@ -121,21 +143,32 @@ export function transformDoc(tdoc: TDoc): HastNode | undefined {
   }
   let node: HastNode;
   if (!children.length) {
-    node = h('div', thisProps, ...thisCard);
+    node = h("div", thisProps, ...thisCard);
   } else {
     const groupedChildren = groupChildren(children);
-    // groupedChildren.length > 1 && console.log("Grouped children", groupedChildren);
-    node = h('details', { open: !doc.ic }, [
-      h('summary', thisProps, ...thisCard),
+    config.debug && groupedChildren.length > 1 && console.log("Grouped children", groupedChildren);
+    node = h("details", { open: !doc.ic || level < config.openLevel }, [
+      h("summary", thisProps, ...thisCard),
       ...groupedChildren,
     ]);
   }
+  if (typeof doc.docUpdated === "number") data.document = true;
   return datanames(node, data);
 }
 
-export function render() {
-  const hTree = transformDoc(root);
-  return toHtml(hTree);
+export const DEFAULT_CONFIG: XformConfig = {
+  openLevel: 2,
+  colorMap: ["current", "red", "orange", "yellow", "green", "indigo", "purple"],
+  debug: false,
+};
+
+export function rem2Hast(workspace: Workspace, config = DEFAULT_CONFIG) {
+  const root = transformDoc(...parseRems(workspace), config);
+  if (root.tagName === "details") root.properties.open = true;
+  return root;
 }
 
-render()
+export function rem2Html(workspace: Workspace, config = DEFAULT_CONFIG) {
+  const hTree = rem2Hast(workspace);
+  return toHtml(hTree);
+}

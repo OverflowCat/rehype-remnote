@@ -8,7 +8,7 @@ export function datanames(node: HastNode, datas: Array<string> | Record<string, 
     } else {
       for (let [key, value] of Object.entries(datas)) {
         if (typeof value === "boolean") {
-          value = value ? "" : undefined;
+          value = value ? true : undefined;
         }
         if (value !== undefined) {
           node.properties[`data-${key}`] = value;

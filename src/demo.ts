@@ -1,15 +1,31 @@
 import f from "fastify";
-import { render } from "./index.js";
+import { DEFAULT_CONFIG, rem2Html } from "./index.js";
+import {
+	/// @type {Workspace}
+	workspace,
+} from "../rem.js";
 
 const fastify = f({
-  // Set this to true for detailed logging:
-  logger: false,
+	// Set this to true for detailed logging:
+	logger: false,
 });
 
-fastify.get("/", function (request, reply) {
-  let html = render();
+let total: number;
+let counter = 0;
+const html = rem2Html(workspace, {
+	...DEFAULT_CONFIG,
+	docHook: (tdoc, docMap, _) => {
+		if (!total) total = docMap.size;
+		console.info(`${++counter} / ${total}`);
+		return [tdoc, docMap];
+	},
+});
 
-  return reply.code(200).type("text/html").send(`
+fastify.get("/", (request, reply) => {
+	return reply
+		.code(200)
+		.type("text/html")
+		.send(`
       <!DOCTYPE html>
       <html>
       <head>
@@ -113,13 +129,10 @@ pre.math-display:not(:only-child) {
 });
 
 // Run the server and report out to the logs
-fastify.listen(
-  { port: 3117, host: "0.0.0.0" },
-  function (err, address) {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    console.log(`Your app is listening on ${address}`);
-  }
-);
+fastify.listen({ port: 3117, host: "0.0.0.0" }, (err, address) => {
+	if (err) {
+		console.error(err);
+		process.exit(1);
+	}
+	console.log(`Your app is listening on ${address}`);
+});

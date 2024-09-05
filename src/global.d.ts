@@ -34,6 +34,19 @@ type Crt = {
     /** Document */
     o?: {
         s?: any;
+        /** Folder */
+        f?: {
+            _id?: any;
+            s?: "true";
+            v?: "true"[];
+        };
+        b?: {
+            _id?: any;
+            /** Folder icon src */
+            s?: string;
+            /** Folder icon src array */
+            v?: string[];
+        }
     }
 }
 
@@ -122,6 +135,8 @@ type Workspace = {
     docs: Doc[];
 }
 
+type CardState = "New" | "Acquiring" | "Growing" | "Solidifying" | "Retaining" | "Stale";
+
 type Doc = ({
     value?: Ele[];
     _id: DocId;
@@ -129,9 +144,16 @@ type Doc = ({
     crt?: Crt | null;
     "crt,u"?: number;
     "crt,o"?: number;
+    folderOpen?: boolean,
+    "folderOpen,u"?: number,
+    "dm": Record<CardState, number>,
     m: number;
     key: Ele[];
     "key,u"?: number;
+    /** Only Doc has these */
+    docUpdated?: number;
+    "docUpdated,u": number;
+    "docUpdated,o": number;
     createdAt: number;
     enableBackSR?: boolean;
     "enableBackSR,u"?: number;
@@ -158,3 +180,17 @@ type Doc = ({
     kr: any[];
     vr: any[];
 };
+
+type TDoc = {
+    val: Doc;
+    ch: TDoc[];
+};
+
+type DocMap = Map<DocId, TDoc>;
+
+type XformConfig = {
+    openLevel: number,
+    colorMap: string[],
+    debug?: boolean,
+    docHook?: (tdoc: TDoc, docMap: DocMap, level: number) => [TDoc, DocMap],
+}

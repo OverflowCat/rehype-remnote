@@ -1,5 +1,5 @@
 import { classnames } from "hast-util-classnames";
-import { Child } from "hastscript";
+import type { Child } from "hastscript";
 import { h } from "hastscript";
 
 export const wrap = (element: Child, tagName: string) => h(tagName, {}, element);
@@ -10,10 +10,9 @@ export const cls = (element: Child, className: string) => {
 }
 
 // red, orange, yellow, green, indigo, purple
-const COLOR_MAP = ["current", "red", "orange", "yellow", "green", "indigo", "purple"];
-function mapColor(color: string | number, saturation: number) {
+function mapColor(color: string | number, saturation: number, map: string[]) {
   if (typeof color === "number")
-    return color === 0 ? COLOR_MAP[color] : COLOR_MAP[color] + "-" + saturation;
+    return color === 0 ? map[color] : map[color] + "-" + saturation;
   return `[${color}]`
 }
 
@@ -22,7 +21,7 @@ function t(text: string) {
   return { type: "text" as const, value: text };
 }
 
-export function m(ele: Ele): Child | undefined {
+export function m(ele: Ele, config: XformConfig): Child | undefined {
   if (typeof ele === "string") {
     return t(ele);
   }
@@ -45,7 +44,6 @@ export function m(ele: Ele): Child | undefined {
     const title = ele.title || "";
     const { url, width, height } = ele;
     tree = h("img", { src: url, alt: title, width, height });
-    console.log("Image", tree);
   } else {
     // text
     if (!ele.text) return;
@@ -66,11 +64,11 @@ export function m(ele: Ele): Child | undefined {
   }
   if (ele.tc) {
     // text color, can be number (1, 2, 3) or hex string (#ff0000)
-    tree = cls(tree, `text-${mapColor(ele.tc, 600)}`);
+    tree = cls(tree, `text-${mapColor(ele.tc, 600, config.colorMap)}`);
   }
   if (ele.h) {
     // highlight color, can be number (1, 2, 3) or hex string (#ff0000)
-    tree = cls(tree, `bg-${mapColor(ele.h, 300)}`);
+    tree = cls(tree, `bg-${mapColor(ele.h, 300,  config.colorMap)}`);
   }
   if (ele.qId) {
     // url
