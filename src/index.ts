@@ -34,19 +34,19 @@ export function parseRems(workspace: Workspace): [TDoc, DocMap] {
   const typeMap = new Map();
   for (const doc of docs) {
     const id = doc._id;
-    const docObj = docMap.get(id);
-    if (docObj) {
-      docObj.val = doc;
-    } else {
-      docMap.set(id, {
-        val: doc,
-        ch: [],
-      });
-    }
-
-    const thisDoc = docMap.get(id);
-
     if (doc.parent) {
+      const docObj = docMap.get(id);
+      if (docObj) {
+        docObj.val = doc;
+      } else {
+        docMap.set(id, {
+          val: doc,
+          ch: [],
+        });
+      }
+
+      const thisDoc = docMap.get(id);
+
       const parent = docMap.get(doc.parent);
       if (parent) {
         parent.ch.push(thisDoc);
@@ -68,15 +68,13 @@ export function parseRems(workspace: Workspace): [TDoc, DocMap] {
 
 export function transformDoc(
   tdoc: TDoc,
-  docMap: DocMap,
   config: XformConfig,
   level = 0
 ): HastNode | undefined {
   if (config.docHook) {
-    console.log('hook')
-    const [_tdoc, _docMap] = config.docHook(tdoc, docMap, level);
+    console.log("hook");
+    const _tdoc = config.docHook(tdoc, level);
     tdoc = _tdoc;
-    docMap = _docMap;
   }
   const doc = tdoc.val;
   if (!doc?.key || (doc?.key.length === 1 && doc.key.at(0)["i"] === "q")) {
@@ -90,22 +88,20 @@ export function transformDoc(
   if (value)
     back = value.map((e) => m(e, config)).filter((x: any) => x !== undefined);
 
-  const children = (doc.ch as Array<any>)
-    .map((x) => docMap.get(x))
-    .filter(Boolean)
-    .map((x) => transformDoc(x, docMap, config, level + 1))
+  const children = (tdoc.ch)
+    .map((x) => transformDoc(x, config, level + 1))
     .filter(Boolean);
   const thisCard =
     back?.length > 0
       ? front.concat(
-          [h("span", { class: "card-arrow" }, doc.enableBackSR ? "←" : "→")],
-          back
-        )
+        [h("span", { class: "card-arrow" }, doc.enableBackSR ? "←" : "→")],
+        back
+      )
       : front.concat(
-          doc["forget"] !== undefined
-            ? [h("span", { class: "card-arrow" }, "↓")]
-            : []
-        );
+        doc["forget"] !== undefined
+          ? [h("span", { class: "card-arrow" }, "↓")]
+          : []
+      );
 
   if (!thisCard.length) return undefined;
 
@@ -117,16 +113,16 @@ export function transformDoc(
       value: JSON.stringify(doc),
       enumerable: true,
       writable: false,
-    })
+    });
   }
 
   const data: Record<string, string | boolean> =
     "crt" in doc && doc.crt
       ? {
-          ordered: Boolean(doc.crt["i"]),
-          answer: Boolean(doc.crt["a"]),
-          folder: Boolean(doc.crt?.o?.f),
-        }
+        ordered: Boolean(doc.crt["i"]),
+        answer: Boolean(doc.crt["a"]),
+        folder: Boolean(doc.crt?.o?.f),
+      }
       : {};
   // @ts-ignore
   if (doc.crt) {
@@ -146,7 +142,9 @@ export function transformDoc(
     node = h("div", thisProps, ...thisCard);
   } else {
     const groupedChildren = groupChildren(children);
-    config.debug && groupedChildren.length > 1 && console.log("Grouped children", groupedChildren);
+    config.debug &&
+      groupedChildren.length > 1 &&
+      console.log("Grouped children", groupedChildren);
     node = h("details", { open: !doc.ic || level < config.openLevel }, [
       h("summary", thisProps, ...thisCard),
       ...groupedChildren,
@@ -162,10 +160,36 @@ export const DEFAULT_CONFIG: XformConfig = {
   debug: false,
 };
 
+export function hydrate(workspace: Workspace) {
+  const [_, docMap] = parseRems(workspace);
+  const result = {
+    documentRemToExportId: workspace.documentRemToExportId,
+    docs: Array.from(docMap.values()).map((x) => {
+      // delete all "***,u" keys from x.val
+      if (x.val) {
+        if (x.val.portalsIn) return false;
+        for (const key in x.val) {
+          if (/^k,|,[ou]$/.test(key)) {
+            delete x.val[key];
+          }
+        }
+        delete x.val.createdAt;
+        delete x.val.owner;
+        delete x.val.k;
+        delete x.val.f;
+        return x;
+      }
+      return false;
+    }).filter(Boolean),
+  };
+  return result;
+}
+
 export function rem2Hast(workspace: Workspace, config = DEFAULT_CONFIG) {
-  const root = transformDoc(...parseRems(workspace), config);
-  if (root.tagName === "details") root.properties.open = true;
-  return root;
+  const [root,] = parseRems(workspace);
+  const hRoot = transformDoc(root, config);
+  if (hRoot.tagName === "details") hRoot.properties.open = true;
+  return hRoot;
 }
 
 export function rem2Html(workspace: Workspace, config = DEFAULT_CONFIG) {

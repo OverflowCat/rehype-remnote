@@ -157,6 +157,8 @@ type Doc = ({
     createdAt: number;
     enableBackSR?: boolean;
     "enableBackSR,u"?: number;
+    /** Portal doc */
+    portalsIn?: any;
     v: number;
     parent: DocId;
     n: number;
@@ -192,5 +194,5 @@ type XformConfig = {
     openLevel: number,
     colorMap: string[],
     debug?: boolean,
-    docHook?: (tdoc: TDoc, docMap: DocMap, level: number) => [TDoc, DocMap],
+    docHook?: (tdoc: TDoc, level: number) => TDoc,
 }
