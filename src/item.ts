@@ -12,7 +12,7 @@ export const cls = (element: Child, className: string) => {
 // red, orange, yellow, green, indigo, purple
 function mapColor(color: string | number, saturation: number, map: string[]) {
   if (typeof color === "number")
-    return color === 0 ? map[color] : map[color] + "-" + saturation;
+    return color === 0 ? map[color] : `${map[color]}-${saturation}`;
   return `[${color}]`
 }
 

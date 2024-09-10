@@ -7,9 +7,8 @@ export function groupChildren(children: HastNode[]): HastNode[] {
     return groups.map(([isOrdered, children]) => {
         if (isOrdered) {
             return h('ol', children.map(x => wrap(x, 'li')));
-        } else {
-            return h('ul', children.map(x => wrap(x, 'li')));
         }
+        return h('ul', children.map(x => wrap(x, 'li')));
     });
 }
 

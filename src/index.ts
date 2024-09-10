@@ -8,7 +8,8 @@ export type HastNode = ReturnType<typeof h>;
 
 /** Helper function for debug */
 export function printDoc(doc: TDoc, depth = 0) {
-  if (doc.val.key.at(0)["i"] === "i") {
+  // @ts-ignore
+  if (doc.val.key.at(0)?.i === "i") {
     // remove "blocks" from it
     doc.val.key.at(0)["blocks"] = undefined;
     doc.val.key.at(0)["textData"] = undefined;
@@ -19,7 +20,7 @@ export function printDoc(doc: TDoc, depth = 0) {
     doc.val.value["textData"] = undefined;
   }
   const res = doc.val.value ? doc.val.key.concat(doc.val.value) : doc.val.key;
-  console.log(stringTimes("= ", depth), JSON.stringify(res));
+  console.debug(stringTimes("= ", depth), JSON.stringify(res));
 
   for (const child of doc.ch) {
     printDoc(child, depth + 1);
@@ -72,7 +73,6 @@ export function transformDoc(
   level = 0
 ): HastNode | undefined {
   if (config.docHook) {
-    console.log("hook");
     const _tdoc = config.docHook(tdoc, level);
     tdoc = _tdoc;
   }
@@ -81,8 +81,8 @@ export function transformDoc(
     return;
   }
   const { key, value, _id } = doc;
-  let front: Child[] = [],
-    back: Child[] = [];
+  let front: Child[] = [];
+  let back: Child[] = [];
   if (key)
     front = key.map((e) => m(e, config)).filter((x: any) => x !== undefined);
   if (value)
@@ -176,8 +176,10 @@ export function hydrate(workspace: Workspace) {
     delete x.val.createdAt;
     delete x.val.owner;
     delete x.val.k;
-    delete x.val.f;
-    x.ch = x.ch.map(simplify).filter(Boolean);
+    if ("f" in x.val) {
+      delete x.val.f;
+    }
+    x.ch = x.ch.map(simplify).filter(Boolean) as TDoc[];
     return x;
   }
   return simplify(root);
@@ -192,5 +194,10 @@ export function rem2Hast(workspace: Workspace, config = DEFAULT_CONFIG) {
 
 export function rem2Html(workspace: Workspace, config = DEFAULT_CONFIG) {
   const hTree = rem2Hast(workspace);
+  return toHtml(hTree);
+}
+
+export function hydrate2Html(hydrated: TDoc, config = DEFAULT_CONFIG) {
+  const hTree = transformDoc(hydrated, config);
   return toHtml(hTree);
 }

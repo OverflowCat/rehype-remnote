@@ -1,5 +1,5 @@
 import f from "fastify";
-import { DEFAULT_CONFIG, hydrate, rem2Html } from "./index.js";
+import { DEFAULT_CONFIG, hydrate, hydrate2Html, rem2Html } from "./index.js";
 import {
   /// @type {Workspace}
   workspace,
@@ -10,21 +10,31 @@ const fastify = f({
   logger: false,
 });
 
+const docHook = (tdoc, _) => {
+  console.info(`${++counter} / ${total}`);
+  return tdoc;
+};
 const total = workspace.docs.length;
 let counter = 0;
-const html = rem2Html(workspace, {
-  ...DEFAULT_CONFIG,
-  docHook: (tdoc, _) => {
-    console.info(`${++counter} / ${total}`);
-    return tdoc;
-  },
-});
+// const html = rem2Html(workspace, {
+//   ...DEFAULT_CONFIG,
+//   docHook
+// });
+
+const hydrated = JSON.stringify(hydrate(workspace));
+
+import fs from "fs";
+fs.writeFileSync("hydrated.json", hydrated);
+const html = hydrate2Html(
+  JSON.parse(fs.readFileSync("hydrated.json", "utf-8")),
+  {
+    ...DEFAULT_CONFIG,
+    docHook,
+  }
+);
 
 fastify.get("/", (request, reply) => {
-  return reply
-    .code(200)
-    .type("text/html")
-    .send(`
+  return reply.code(200).type("text/html").send(`
       <!DOCTYPE html>
       <html>
       <head>
@@ -126,11 +136,6 @@ pre.math-display:not(:only-child) {
     </body>
     </html>`);
 });
-
-const hydrated = JSON.stringify(hydrate(workspace));
-
-import fs from "fs";
-fs.writeFileSync("hydrated.json", hydrated);
 
 // Run the server and report out to the logs
 fastify.listen({ port: 3117, host: "0.0.0.0" }, (err, address) => {

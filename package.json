@@ -4,44 +4,39 @@
   "description": "Convert RemNote .rem JSON to rehype AST",
   "main": "server.js",
   "type": "module",
+  "author": {
+    "name": "OverflowCat",
+    "email": "overflowcat@gmail.com"
+  },
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch"
+    "build": "tsc",
+    "dev": "tsc -w"
   },
   "engines": {
     "node": ">=20"
   },
   "repository": {
-    "url": "https://glitch.com/edit/#!/glitch-hello-node"
+    "url": "https://github.com/OverflowCat/rehype-remnote"
   },
   "license": "MIT",
   "keywords": [
-    "node",
-    "glitch"
+    "remnote",
+    "rehype",
+    "html"
   ],
-  "tsup": {
-    "entry": [
-      "src/demo.ts"
-    ],
-    "format": [
-      "esm"
-    ],
-    "dts": true
-  },
   "dependencies": {
     "hast-util-classnames": "^3.0.0",
     "hastscript": "^9.0.0",
     "rehype-parse": "^9.0.0",
     "rehype-stringify": "^10.0.0",
     "unified": "^11.0.5",
+    "hast-util-to-html": "^9.0.2",
     "vfile": "^6.0.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
     "@types/node": "^22.5.2",
     "fastify": "^4.28.1",
-    "hast-util-to-html": "^9.0.2",
-    "tsup": "^8.2.4",
     "typescript": "^5.5.4"
   }
 }
