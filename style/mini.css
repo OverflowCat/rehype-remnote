@@ -1,0 +1,44 @@
+.rem * {
+    box-sizing: border-box;
+}
+
+.rem ul, .rem ol {
+    padding-inline-start: 5ch;
+    list-style: initial;
+}
+
+.rem ol {
+    list-style-type: decimal;
+}
+
+.rem ol ol {
+    list-style-type: lower-alpha;
+}
+
+.rem ol ol ol {
+    list-style-type: lower-roman;
+}
+
+.rem li:has(details) {
+    margin-inline-start: -2ch;
+}
+
+.rem ul li:has(details) {
+    list-style-type: none;
+    /* hide the marker of li */
+}
+
+.rem details {
+    position: relative;
+}
+
+.rem details[open]:before {
+    content: "";
+    position: absolute;
+    inset-inline-start: .5ch;
+    inset-block-start: 1em;
+    inset-block-end: 2px;
+    border-inline-start: 2px dashed #333;
+    z-index: -1;
+}
+

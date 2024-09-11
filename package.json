@@ -1,6 +1,6 @@
 {
   "name": "rehype-remnote",
-  "version": "0.1.0",
+  "version": "0.2.0-rc2",
   "description": "Convert RemNote .rem JSON to rehype AST",
   "main": "server.js",
   "type": "module",
@@ -10,7 +10,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc -w"
+    "watch": "tsc -w",
+    "view": "node dist/demo",
+    "pub": "tsc && npm publish"
   },
   "engines": {
     "node": ">=20"
@@ -24,17 +26,25 @@
     "rehype",
     "html"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
   "dependencies": {
     "hast-util-classnames": "^3.0.0",
+    "hast-util-to-html": "^9.0.2",
     "hastscript": "^9.0.0",
     "rehype-parse": "^9.0.0",
     "rehype-stringify": "^10.0.0",
     "unified": "^11.0.5",
-    "hast-util-to-html": "^9.0.2",
     "vfile": "^6.0.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
+    "@fastify/static": "^7.0.4",
+    "@types/hast": "^3.0.4",
     "@types/node": "^22.5.2",
     "fastify": "^4.28.1",
     "typescript": "^5.5.4"

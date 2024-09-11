@@ -1,0 +1,18 @@
+:target {
+    animation: highlight 1s ease-in-out 4;
+    background-color: rgba(253, 224, 71, .8);
+}
+
+@keyframes highlight {
+    from {
+        background-color: rgba(253, 224, 71, .8);
+    }
+
+    50% {
+        background-color: rgba(253, 224, 71, .3);
+    }
+
+    to {
+        background-color: rgba(253, 224, 71, .8);
+    }
+}

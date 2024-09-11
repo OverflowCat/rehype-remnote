@@ -1,0 +1,3 @@
+pre.math-display:not(:only-child) {
+    display: inline-block;
+}

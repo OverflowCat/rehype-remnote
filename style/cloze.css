@@ -1,0 +1,25 @@
+span.cloze {
+    font-weight: 600;
+    color: #008007;
+}
+
+span.cloze input {
+    display: none;
+}
+
+span.cloze input:checked+label {
+    display: none;
+}
+
+span.cloze input:checked+label+label {
+    display: unset;
+}
+
+span.cloze input+label {
+    cursor: zoom-in;
+}
+
+span.cloze input+label+label {
+    display: none;
+    cursor: zoom-out;
+}
