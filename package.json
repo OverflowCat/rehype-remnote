@@ -1,6 +1,6 @@
 {
   "name": "rehype-remnote",
-  "version": "0.2.0-rc2",
+  "version": "0.2.0",
   "description": "Convert RemNote .rem JSON to rehype AST",
   "main": "server.js",
   "type": "module",
@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "view": "node dist/demo",
+    "dev": "node dist/demo",
     "pub": "tsc && npm publish"
   },
   "engines": {
@@ -30,7 +30,8 @@
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.js"
-    }
+    },
+    "./style/*": "./style/*"
   },
   "dependencies": {
     "hast-util-classnames": "^3.0.0",

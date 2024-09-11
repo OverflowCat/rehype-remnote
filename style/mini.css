@@ -3,7 +3,7 @@
 }
 
 .rem ul, .rem ol {
-    padding-inline-start: 5ch;
+    padding-inline-start: var(--list-indent, 5ch);
     list-style: initial;
 }
 
@@ -20,7 +20,7 @@
 }
 
 .rem li:has(details) {
-    margin-inline-start: -2ch;
+    margin-inline-start: var(--list-item-delta, -2ch);
 }
 
 .rem ul li:has(details) {
@@ -30,15 +30,25 @@
 
 .rem details {
     position: relative;
+    padding-inline-start: var(--details-padding-inline, .75ch);
+    padding-inline-end: var(--details-padding-inline, .75ch);
+    padding-block-start: .2em;
+    padding-block-end: .2em;
+    margin-block-end: .2em;
+    border-radius: 4px;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.rem details:hover {
+    background-color: var(--hover-bg-color, rgba(80, 80, 80, 0.05));
 }
 
 .rem details[open]:before {
     content: "";
     position: absolute;
-    inset-inline-start: .5ch;
-    inset-block-start: 1em;
-    inset-block-end: 2px;
+    inset-inline-start: calc(var(--details-padding-inline, .75ch) + var(--details-marker-delta, .5ch));
+    inset-block-start: var(--details-indent, 1em);
+    inset-block-end: var(--details-inset-block-end, 2px);
     border-inline-start: 2px dashed #333;
     z-index: -1;
 }
-
