@@ -24,6 +24,14 @@ type Crt = {
     r?: {
         s: any;
     }
+    /** code */
+    cd?: {
+        /** language */
+        l?: {
+            v: string[];
+            s: string;
+        }
+    };
     /** Link? */
     a?: {};
     /** Link? */

@@ -1,6 +1,6 @@
 import { type Child, h } from "hastscript";
 
-import { m } from "./item.js";
+import { m, t } from "./item.js";
 import { groupChildren } from "./ordered.js";
 import { datanames } from "./util.js";
 import { toHtml } from "hast-util-to-html";
@@ -81,6 +81,19 @@ export function transformDoc(
     return;
   }
   const { key, value, _id } = doc;
+
+  if (doc.crt?.cd?.l) {
+    // code block
+    const cd = doc.crt.cd;
+    let lang = cd.l?.s;
+    if (lang === "No Language") lang = "text";
+    const code = h("code", { class: `language-${lang}` },
+      t(key.at(0) as string)
+    );
+    const pre = h("pre", code);
+    return pre;
+  }
+
   let front: Child[] = [];
   let back: Child[] = [];
   if (key)
@@ -91,7 +104,7 @@ export function transformDoc(
   const children = (tdoc.ch)
     .map((x) => transformDoc(x, config, level + 1))
     .filter(Boolean);
-  const thisCard =
+  let thisCard =
     back?.length > 0
       ? front.concat(
         [h("span", { class: "card-arrow" }, doc.enableBackSR ? "←" : "→")],

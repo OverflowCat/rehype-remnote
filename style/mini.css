@@ -19,11 +19,11 @@
     list-style-type: lower-roman;
 }
 
-.rem li:has(details) {
+.rem li:has(details:only-child) {
     margin-inline-start: var(--list-item-delta, -2.9ch);
 }
 
-.rem ul li:has(details) {
+.rem ul li:has(details:only-child) {
     list-style-type: none;
     /* hide the marker of li */
 }
@@ -37,6 +37,18 @@
     margin-block-end: .2em;
     border-radius: 4px;
     transition: var(--bg-transition, background-color 0.15s ease-in-out);
+}
+
+.rem summary {
+    margin: 0;
+    padding-block: 0;
+    padding-inline-end: 0;
+    padding-inline-start: var(--details-summary-indent, 2ch);
+    text-indent: calc(-1 * var(--details-summary-indent, 2ch));
+}
+
+.rem summary * {
+    text-indent: initial; /* prevent inheritance */
 }
 
 .rem details:hover {

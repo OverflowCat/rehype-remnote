@@ -17,7 +17,7 @@ function mapColor(color: string | number, saturation: number, map: string[]) {
 }
 
 /** Make text */
-function t(text: string) {
+export function t(text: string) {
   return { type: "text" as const, value: text };
 }
 
