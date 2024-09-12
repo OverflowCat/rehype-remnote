@@ -127,7 +127,7 @@ export function transformDoc(
   // @ts-ignore
   if (doc.crt) {
     const crt = doc.crt as Crt;
-    if (crt.im?.i.v.length) {
+    if (crt.im?.i?.v?.length) {
       const { width, height } = crt["im"].i.v[0];
       const tree = h("img.float-end.inline-block", {
         src: crt.im.i.s,

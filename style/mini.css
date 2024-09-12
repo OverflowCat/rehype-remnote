@@ -20,7 +20,7 @@
 }
 
 .rem li:has(details) {
-    margin-inline-start: var(--list-item-delta, -2ch);
+    margin-inline-start: var(--list-item-delta, -2.9ch);
 }
 
 .rem ul li:has(details) {
@@ -36,7 +36,7 @@
     padding-block-end: .2em;
     margin-block-end: .2em;
     border-radius: 4px;
-    transition: background-color 0.15s ease-in-out;
+    transition: var(--bg-transition, background-color 0.15s ease-in-out);
 }
 
 .rem details:hover {
