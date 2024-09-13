@@ -104,7 +104,7 @@ export function transformDoc(
   const children = (tdoc.ch)
     .map((x) => transformDoc(x, config, level + 1))
     .filter(Boolean);
-  let thisCard =
+  const thisCard =
     back?.length > 0
       ? front.concat(
         [h("span", { class: "card-arrow" }, doc.enableBackSR ? "←" : "→")],
@@ -155,13 +155,18 @@ export function transformDoc(
     node = h("div", thisProps, ...thisCard);
   } else {
     const groupedChildren = groupChildren(children);
-    config.debug &&
-      groupedChildren.length > 1 &&
-      console.log("Grouped children", groupedChildren);
-    node = h("details", { open: !doc.ic || level < config.openLevel }, [
-      h("summary", thisProps, ...thisCard),
-      ...groupedChildren,
-    ]);
+    if (level === 0 && config.unwrapRoot) {
+      node = h("div", thisProps, ...thisCard, ...groupedChildren);
+    }
+    else {
+      config.debug &&
+        groupedChildren.length > 1 &&
+        console.log("Grouped children", groupedChildren);
+      node = h("details", { open: !doc.ic || level < config.openLevel }, [
+        h("summary", thisProps, ...thisCard),
+        ...groupedChildren,
+      ]);
+    }
   }
   if (typeof doc.docUpdated === "number") data.document = true;
   return datanames(node, data);

@@ -30,6 +30,7 @@ const html = hydrate2Html(
   JSON.parse(fs.readFileSync("hydrated.json", "utf-8")),
   {
     ...DEFAULT_CONFIG,
+    unwrapRoot: true,
     docHook,
   }
 );

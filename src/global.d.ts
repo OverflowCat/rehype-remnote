@@ -200,6 +200,7 @@ type DocMap = Map<DocId, TDoc>;
 
 type XformConfig = {
     openLevel: number,
+    unwrapRoot?: boolean,
     colorMap: string[],
     debug?: boolean,
     docHook?: (tdoc: TDoc, level: number) => TDoc,

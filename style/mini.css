@@ -1,10 +1,30 @@
+.rem {
+    --list-indent: 4.2ch;
+    --list-item-delta: -2.9ch;
+    --details-padding-inline: .75ch;
+    --details-padding-block: .2em;
+    --details-summary-indent: 2ch;
+    --hover-bg-color: rgba(100, 100, 100, 0.08);
+    --active-bg-color: rgba(100, 100, 100, 0.14);
+    --details-indent: 1em;
+    --details-inset-block-end: 2px;
+    --details-marker-delta: .5ch;
+    --details-border-inline-start: 2px dashed #333;
+    --bg-transition: background-color 0.15s ease-in-out;
+    --border-radius: 4px;
+}
+
 .rem * {
     box-sizing: border-box;
 }
 
 .rem ul, .rem ol {
-    padding-inline-start: var(--list-indent, 5ch);
+    padding-inline-start: var(--list-indent);
     list-style: initial;
+}
+
+.rem ul:not(details *), .rem ol:not(details *) {
+    padding-inline-start: unset;
 }
 
 .rem ol {
@@ -20,7 +40,7 @@
 }
 
 .rem li:has(details:only-child) {
-    margin-inline-start: var(--list-item-delta, -2.9ch);
+    margin-inline-start: var(--list-item-delta);
 }
 
 .rem ul li:has(details:only-child) {
@@ -30,21 +50,21 @@
 
 .rem details {
     position: relative;
-    padding-inline-start: var(--details-padding-inline, .75ch);
-    padding-inline-end: var(--details-padding-inline, .75ch);
-    padding-block-start: .2em;
-    padding-block-end: .2em;
+    padding-inline-start: var(--details-padding-inline);
+    padding-inline-end: var(--details-padding-inline);
+    padding-block-start: var(--details-padding-block);
+    padding-block-end: var(--details-padding-block);
     margin-block-end: .2em;
-    border-radius: 4px;
-    transition: var(--bg-transition, background-color 0.15s ease-in-out);
+    border-radius: var(--border-radius);
+    transition: var(--bg-transition);
 }
 
 .rem summary {
     margin: 0;
     padding-block: 0;
     padding-inline-end: 0;
-    padding-inline-start: var(--details-summary-indent, 2ch);
-    text-indent: calc(-1 * var(--details-summary-indent, 2ch));
+    padding-inline-start: var(--details-summary-indent);
+    text-indent: calc(-1 * var(--details-summary-indent));
 }
 
 .rem summary * {
@@ -52,15 +72,14 @@
 }
 
 .rem details:hover {
-    background-color: var(--hover-bg-color, rgba(80, 80, 80, 0.05));
+    background-color: var(--hover-bg-color);
 }
 
 .rem details[open]:before {
     content: "";
     position: absolute;
     inset-inline-start: calc(var(--details-padding-inline, .75ch) + var(--details-marker-delta, .5ch));
-    inset-block-start: var(--details-indent, 1em);
-    inset-block-end: var(--details-inset-block-end, 2px);
-    border-inline-start: 2px dashed #333;
-    z-index: -1;
+    inset-block-start: var(--details-indent);
+    inset-block-end: var(--details-inset-block-end);
+    border-inline-start: var(--details-border-inline-start);
 }
