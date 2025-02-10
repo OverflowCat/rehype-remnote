@@ -36,8 +36,20 @@ type Crt = {
     a?: {};
     /** Link? */
     z?: {};
+    /** Link */
     b?: {
-        u?: any;
+        /** Link target */
+        u?: {
+            "_id": string;
+            v: string[]; // title
+            s: string; // title
+        };
+        /** Link title */
+        t?: {
+            "_id": string;
+            v: string[]; // URL
+            s: string; // URL
+        };
     }
     /** Document */
     o?: {
@@ -196,7 +208,7 @@ type TDoc = {
     ch: TDoc[];
 };
 
-type DocMap = Map<DocId, TDoc>;
+type DocMap = Map<DocId, Doc>;
 
 type XformConfig = {
     openLevel: number,
@@ -204,4 +216,10 @@ type XformConfig = {
     colorMap: string[],
     debug?: boolean,
     docHook?: (tdoc: TDoc, level: number) => TDoc,
+}
+
+type Context = {
+    config: XformConfig
+    /** all docs in the workspace */
+    docMap: DocMap
 }

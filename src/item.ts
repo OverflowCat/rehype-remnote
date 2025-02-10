@@ -21,11 +21,11 @@ export function t(text: string) {
   return { type: "text" as const, value: text };
 }
 
-export function m(ele: Ele, config: XformConfig): Child | undefined {
+export function m(ele: Ele, ctx: Context): Child | undefined {
+  const { config, docMap } = ctx;
   if (typeof ele === "string") {
     return t(ele);
   }
-
   // rich text
   let tree: Child;
   if (ele.i === 'x') {
@@ -44,6 +44,13 @@ export function m(ele: Ele, config: XformConfig): Child | undefined {
     const title = ele.title || "";
     const { url, width, height } = ele;
     tree = h("img", { src: url, alt: title, width, height });
+  } else if (ele.i === 'm') {
+    // url
+    const { qId, text } = ele;
+    const linkEle = docMap.get(qId);
+    console.log({ qId, linkEle });
+    const href = linkEle?.crt.b.u?.s || `#q-${qId}`;
+    tree = h("a", { href }, text);
   } else {
     // text
     if (!ele.text) return;
@@ -68,7 +75,7 @@ export function m(ele: Ele, config: XformConfig): Child | undefined {
   }
   if (ele.h) {
     // highlight color, can be number (1, 2, 3) or hex string (#ff0000)
-    tree = cls(tree, `bg-${mapColor(ele.h, 300,  config.colorMap)}`);
+    tree = cls(tree, `bg-${mapColor(ele.h, 300, config.colorMap)}`);
   }
   if (ele.qId) {
     // url

@@ -1,15 +1,18 @@
 import f from "fastify";
+import fs from "node:fs";
 import path from "node:path";
 import { DEFAULT_CONFIG, hydrate, hydrate2Html, rem2Html } from "./index.js";
 import {
   /// @type {Workspace}
   workspace,
-} from "../rem.js";
+} from "../test.js";
 
 const fastify = f({
   // Set this to true for detailed logging:
   logger: false,
 });
+
+const useHydration = false;
 
 const docHook = (tdoc, _) => {
   console.info(`${++counter} / ${total}`);
@@ -17,23 +20,27 @@ const docHook = (tdoc, _) => {
 };
 const total = workspace.docs.length;
 let counter = 0;
-// const html = rem2Html(workspace, {
-//   ...DEFAULT_CONFIG,
-//   docHook
-// });
 
-const hydrated = JSON.stringify(hydrate(workspace));
+if (useHydration) {
 
-import fs from "fs";
-fs.writeFileSync("hydrated.json", hydrated);
-const html = hydrate2Html(
-  JSON.parse(fs.readFileSync("hydrated.json", "utf-8")),
-  {
+  const hydrated = JSON.stringify(hydrate(workspace));
+
+  fs.writeFileSync("hydrated.json", hydrated);
+  const html = hydrate2Html(
+    JSON.parse(fs.readFileSync("hydrated.json", "utf-8")),
+    {
+      ...DEFAULT_CONFIG,
+      unwrapRoot: true,
+      docHook,
+    }
+  );
+}
+else {
+  var html = rem2Html(workspace, {
     ...DEFAULT_CONFIG,
-    unwrapRoot: true,
-    docHook,
-  }
-);
+    docHook
+  });
+}
 
 fastify.get("/", (request, reply) => {
   return reply.code(200).type("text/html").send(`

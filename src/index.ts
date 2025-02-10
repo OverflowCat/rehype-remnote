@@ -29,30 +29,38 @@ export function printDoc(doc: TDoc, depth = 0) {
 
 const stringTimes = (str: string, n: number) => Array(n).fill(str).join("");
 
+/** Internal use only */
+type DocTree = Map<DocId, TDoc>;
+
 export function parseRems(workspace: Workspace): [TDoc, DocMap] {
+  /** Middle result. Only return root node */
+  const docTree: DocTree = new Map();
+  /** Plain doc map */
   const docMap: DocMap = new Map();
   const docs = workspace.docs;
   const typeMap = new Map();
   for (const doc of docs) {
     const id = doc._id;
+
+    docMap.set(id, doc);
     if (doc.parent) {
-      const docObj = docMap.get(id);
+      const docObj = docTree.get(id);
       if (docObj) {
         docObj.val = doc;
       } else {
-        docMap.set(id, {
+        docTree.set(id, {
           val: doc,
           ch: [],
         });
       }
 
-      const thisDoc = docMap.get(id);
+      const thisDoc = docTree.get(id);
 
-      const parent = docMap.get(doc.parent);
+      const parent = docTree.get(doc.parent);
       if (parent) {
         parent.ch.push(thisDoc);
       } else {
-        docMap.set(doc.parent, {
+        docTree.set(doc.parent, {
           val: undefined,
           ch: [thisDoc],
         });
@@ -63,15 +71,20 @@ export function parseRems(workspace: Workspace): [TDoc, DocMap] {
     }
   }
 
-  const root = docMap.get(workspace.documentRemToExportId)!;
+  const root = docTree.get(workspace.documentRemToExportId);
+  if (!root) {
+    throw new Error(`No root document with id ${workspace.documentRemToExportId}`);
+  }
+
   return [root, docMap];
 }
 
 export function transformDoc(
   tdoc: TDoc,
-  config: XformConfig,
+  ctx: Context,
   level = 0
 ): HastNode | undefined {
+  const { config } = ctx;
   if (config.docHook) {
     const _tdoc = config.docHook(tdoc, level);
     tdoc = _tdoc;
@@ -96,13 +109,14 @@ export function transformDoc(
 
   let front: Child[] = [];
   let back: Child[] = [];
+
   if (key)
-    front = key.map((e) => m(e, config)).filter((x: any) => x !== undefined);
+    front = key.map((e) => m(e, ctx)).filter((x) => x !== undefined);
   if (value)
-    back = value.map((e) => m(e, config)).filter((x: any) => x !== undefined);
+    back = value.map((e) => m(e, ctx)).filter((x) => x !== undefined);
 
   const children = (tdoc.ch)
-    .map((x) => transformDoc(x, config, level + 1))
+    .map((x) => transformDoc(x, ctx, level + 1))
     .filter(Boolean);
   const thisCard =
     back?.length > 0
@@ -132,8 +146,8 @@ export function transformDoc(
   const data: Record<string, string | boolean> =
     "crt" in doc && doc.crt
       ? {
-        ordered: Boolean(doc.crt["i"]),
-        answer: Boolean(doc.crt["a"]),
+        ordered: Boolean(doc.crt.i),
+        answer: Boolean(doc.crt.a),
         folder: Boolean(doc.crt?.o?.f),
       }
       : {};
@@ -141,7 +155,7 @@ export function transformDoc(
   if (doc.crt) {
     const crt = doc.crt as Crt;
     if (crt.im?.i?.v?.length) {
-      const { width, height } = crt["im"].i.v[0];
+      const { width, height } = crt.im.i.v[0];
       const tree = h("img.float-end.inline-block", {
         src: crt.im.i.s,
         width,
@@ -179,7 +193,7 @@ export const DEFAULT_CONFIG: XformConfig = {
 };
 
 export function hydrate(workspace: Workspace) {
-  const [root] = parseRems(workspace);
+  const [root, docMap] = parseRems(workspace);
   function simplify(x: TDoc) {
     // delete all "***,u" keys from x.val
     if (!x.val) {
@@ -204,18 +218,31 @@ export function hydrate(workspace: Workspace) {
 }
 
 export function rem2Hast(workspace: Workspace, config = DEFAULT_CONFIG) {
-  const [root,] = parseRems(workspace);
-  const hRoot = transformDoc(root, config);
+  const [root, docMap] = parseRems(workspace);
+  const hRoot = transformDoc(root, { config, docMap });
   if (hRoot.tagName === "details") hRoot.properties.open = true;
   return hRoot;
 }
 
 export function rem2Html(workspace: Workspace, config = DEFAULT_CONFIG) {
-  const hTree = rem2Hast(workspace);
+  const hTree = rem2Hast(workspace, config);
   return toHtml(hTree);
 }
 
+/** Generate a plain doc map from a hydrated docTree */
+function hydrate2DocMap(hydrated: TDoc) {
+  const docMap = new Map();
+  function walk(x: TDoc) {
+    docMap.set(x.val._id, x);
+    x.ch.forEach(walk);
+  }
+  walk(hydrated);
+  return docMap;
+}
+
+/** @deprecated only compatible with 0.2.x hydration */
 export function hydrate2Html(hydrated: TDoc, config = DEFAULT_CONFIG) {
-  const hTree = transformDoc(hydrated, config);
+  const docMap = hydrate2DocMap(hydrated);
+  const hTree = transformDoc(hydrated, { config, docMap });
   return toHtml(hTree);
 }
