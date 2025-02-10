@@ -1,6 +1,6 @@
 import { type Child, h } from "hastscript";
 
-import { m, t } from "./item.js";
+import { cls, m, t, mapColor } from "./item.js";
 import { groupChildren } from "./ordered.js";
 import { datanames } from "./util.js";
 import { toHtml } from "hast-util-to-html";
@@ -164,6 +164,11 @@ export function transformDoc(
       thisCard.unshift(tree);
     }
   }
+
+  if (doc.crt?.h?.c?.s && thisCard.length > 0 /* TODO */) { // add bg color
+    thisCard[0] = cls(thisCard[0], `bg-${mapColor(doc.crt?.h?.c?.s, 300, config.colorMap)}`);
+  }
+
   let node: HastNode;
   if (!children.length) {
     node = h("div", thisProps, ...thisCard);

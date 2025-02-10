@@ -10,7 +10,7 @@ export const cls = (element: Child, className: string) => {
 }
 
 // red, orange, yellow, green, indigo, purple
-function mapColor(color: string | number, saturation: number, map: string[]) {
+export function mapColor(color: string | number, saturation: number, map: string[]) {
   if (typeof color === "number")
     return color === 0 ? map[color] : `${map[color]}-${saturation}`;
   return `[${color}]`
@@ -45,13 +45,18 @@ export function m(ele: Ele, ctx: Context): Child | undefined {
     const { url, width, height } = ele;
     tree = h("img", { src: url, alt: title, width, height });
   } else if (ele.i === 'm') {
-    // url
+    // maybe url
     const { qId, text } = ele;
     const linkEle = docMap.get(qId);
-    console.log({ qId, linkEle });
-    const href = linkEle?.crt.b.u?.s || `#q-${qId}`;
-    tree = h("a", { href }, text);
-  } else {
+    console.debug({ qId, linkEle });
+    if (linkEle) {
+      const href = linkEle?.crt.b.u?.s || `#q-${qId}`;
+      const title = linkEle?.crt.b.t?.s;
+      tree = h("a", { href, title }, text);
+    }
+  }
+
+  if (!tree) {
     // text
     if (!ele.text) return;
     tree = t(ele.text);
@@ -93,5 +98,6 @@ export function m(ele: Ele, ctx: Context): Child | undefined {
       ]
     )
   }
+
   return tree;
 }

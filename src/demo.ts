@@ -18,6 +18,7 @@ const docHook = (tdoc, _) => {
   console.info(`${++counter} / ${total}`);
   return tdoc;
 };
+
 const total = workspace.docs.length;
 let counter = 0;
 

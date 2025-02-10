@@ -1,6 +1,6 @@
 {
   "name": "rehype-remnote",
-  "version": "0.3.0-beta.1",
+  "version": "0.3.0",
   "description": "Convert RemNote .rem JSON to rehype AST",
   "main": "server.js",
   "type": "module",

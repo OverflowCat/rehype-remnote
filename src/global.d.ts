@@ -1,5 +1,7 @@
 type DocId = string;
 
+type ColorStr = string;
+
 type Crt = {
     /** Ordered List item */
     i?: {};
@@ -21,6 +23,20 @@ type Crt = {
             s: string;
         }
     }
+    h?: {
+        /** Highlight color */
+        c?: {
+            _id: string;
+            v: {
+                i: "q";
+                _id: string;
+            }[];
+            /** @example "Blue" */
+            s: ColorStr;
+        }
+    }
+    clo?: {
+    }
     r?: {
         s: any;
     }
@@ -36,7 +52,7 @@ type Crt = {
     a?: {};
     /** Link? */
     z?: {};
-    /** Link */
+    /** Link element */
     b?: {
         /** Link target */
         u?: {

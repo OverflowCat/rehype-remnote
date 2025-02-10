@@ -1,3 +1,4 @@
 node_modules
-rem.js
-hydrated.json
+/rem*.js
+test.js
+*.json
