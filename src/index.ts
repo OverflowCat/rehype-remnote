@@ -154,7 +154,7 @@ export function transformDoc(
   // @ts-ignore
   if (doc.crt) {
     const crt = doc.crt as Crt;
-    if (crt.im?.i?.v?.length) {
+    if (crt.im?.i?.v?.length) { // right side img
       const { width, height } = crt.im.i.v[0];
       const tree = h("img.float-end.inline-block", {
         src: crt.im.i.s,
@@ -165,28 +165,33 @@ export function transformDoc(
     }
   }
 
-  if (doc.crt?.h?.c?.s && thisCard.length > 0 /* TODO */) { // add bg color
-    thisCard[0] = cls(thisCard[0], `bg-${mapColor(doc.crt?.h?.c?.s, 300, config.colorMap)}`);
-  }
-
   let node: HastNode;
+  let firstBlock: Child;
+
   if (!children.length) {
     node = h("div", thisProps, ...thisCard);
+    firstBlock = node;
   } else {
     const groupedChildren = groupChildren(children);
     if (level === 0 && config.unwrapRoot) {
       node = h("div", thisProps, ...thisCard, ...groupedChildren);
+      firstBlock = thisCard[0];
     }
     else {
       config.debug &&
         groupedChildren.length > 1 &&
         console.log("Grouped children", groupedChildren);
+      firstBlock = h("summary", thisProps, ...thisCard);
       node = h("details", { open: !doc.ic || level < config.openLevel }, [
-        h("summary", thisProps, ...thisCard),
+        firstBlock,
         ...groupedChildren,
       ]);
     }
   }
+  if (doc.crt?.h?.c?.s && thisCard.length > 0 /* TODO */) { // add bg color
+    cls(firstBlock, `bg-${mapColor(doc.crt?.h?.c?.s, 300, config.colorMap)}`, true);
+  }
+
   if (typeof doc.docUpdated === "number") data.document = true;
   return datanames(node, data);
 }

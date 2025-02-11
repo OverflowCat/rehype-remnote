@@ -3,9 +3,11 @@ import type { Child } from "hastscript";
 import { h } from "hastscript";
 
 export const wrap = (element: Child, tagName: string) => h(tagName, {}, element);
-export const cls = (element: Child, className: string) => {
+
+export const cls = (element: Child, className: string, inplace = false) => {
   if (typeof element === "object" && ("type" in element) && element.type === "element")
     return classnames(element, className);
+  if (inplace) throw new Error("Cannot add class to text node");
   return h("span", { class: className }, element);
 }
 

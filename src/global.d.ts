@@ -1,6 +1,32 @@
 type DocId = string;
 
+type VsPair<T> = {
+    id: string;
+    v: T[];
+    s: T;
+}
+
 type ColorStr = string;
+
+type LinkTitle = string;
+
+type CCallout = {
+    b: VsPair<T>
+}
+
+type RightSideImage = {
+    i: {
+        _id: string;
+        v: {
+            i: "i";
+            width: number;
+            height: number;
+            /** URL */
+            s: string;
+        }[];
+        s: string;
+    }
+}
 
 type Crt = {
     /** Ordered List item */
@@ -9,20 +35,7 @@ type Crt = {
     w?: {};
     /** Quoteblock */
     qt?: {};
-    /** Right side Image */
-    im?: {
-        i: {
-            _id: string;
-            v: {
-                i: "i";
-                width: number;
-                height: number;
-                /** URL */
-                s: string;
-            }[];
-            s: string;
-        }
-    }
+    im?: RightSideImage;
     h?: {
         /** Highlight color */
         c?: {
@@ -35,8 +48,7 @@ type Crt = {
             s: ColorStr;
         }
     }
-    clo?: {
-    }
+    clo?: CCallout
     r?: {
         s: any;
     }
@@ -55,34 +67,17 @@ type Crt = {
     /** Link element */
     b?: {
         /** Link target */
-        u?: {
-            "_id": string;
-            v: string[]; // title
-            s: string; // title
-        };
+        u?: VsPair<LinkTitle>;
         /** Link title */
-        t?: {
-            "_id": string;
-            v: string[]; // URL
-            s: string; // URL
-        };
+        t?: VsPair<string>;
     }
     /** Document */
     o?: {
         s?: any;
         /** Folder */
-        f?: {
-            _id?: any;
-            s?: "true";
-            v?: "true"[];
-        };
-        b?: {
-            _id?: any;
-            /** Folder icon src */
-            s?: string;
-            /** Folder icon src array */
-            v?: string[];
-        }
+        f?: VsPair<"true">;
+        /** Folder icon */
+        b?: VsPair<string>;
     }
 }
 
