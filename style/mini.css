@@ -11,19 +11,24 @@
     --details-marker-delta: .5ch;
     --details-border-inline-start: 2px dashed #333;
     --bg-transition: background-color 0.15s ease-in-out;
+    --bg-theme: rgb(185, 158, 255);
+    --bg-callout: color-mix(in oklab, var(--bg-theme), white, 10%);
     --border-radius: 4px;
+    --border-color: rgb(50, 50, 52);
 }
 
 .rem * {
     box-sizing: border-box;
 }
 
-.rem ul, .rem ol {
+.rem ul,
+.rem ol {
     padding-inline-start: var(--list-indent);
     list-style: initial;
 }
 
-.rem ul:not(details *), .rem ol:not(details *) {
+.rem ul:not(details *),
+.rem ol:not(details *) {
     padding-inline-start: unset;
 }
 
@@ -68,7 +73,8 @@
 }
 
 .rem summary * {
-    text-indent: initial; /* prevent inheritance */
+    text-indent: initial;
+    /* prevent inheritance */
 }
 
 .rem details:hover {
@@ -82,4 +88,21 @@
     inset-block-start: var(--details-indent);
     inset-block-end: var(--details-inset-block-end);
     border-inline-start: var(--details-border-inline-start);
+}
+
+.rem .callout {
+    padding: .5em;
+    background-color: var(--bg-callout);
+    border: 1px solid var(--border-color);
+}
+
+.rem .callout[data-callout-icon]::before {
+    content: attr(data-callout-icon);
+    display: inline-block;
+    margin-inline-end: .5ch;
+}
+
+.rem .callout .callout-icon {
+    margin-inline-start: .4ch;
+    margin-inline-end: .8ch;
 }

@@ -1,9 +1,27 @@
 import { classnames } from "hast-util-classnames";
-import type { Child } from "hastscript";
+import type { Child, Properties } from "hastscript";
 import { h } from "hastscript";
 
 export const wrap = (element: Child, tagName: string) => h(tagName, {}, element);
+export function wrapElementChildren(
+  element: Child, tagName: string, properties: Properties,
+  prepend: Child[] = [], append: Child[] = []
+): Child {
+  // @ts-expect-error
+  console.log(element.children)
+  // @ts-expect-error
+  const innerElement = h(tagName, properties, element.children);
+  // @ts-expect-error
+  element.children = [...prepend, innerElement, ...append];
+  return element;
+}
 
+/**
+ * @description Add `className`s to a Node
+ * @param className New class names to add
+ * @param inplace Check if the Node is an Element. If not, throw an error
+ * @returns the new Node or the original Node if it's not a text node
+ */
 export const cls = (element: Child, className: string, inplace = false) => {
   if (typeof element === "object" && ("type" in element) && element.type === "element")
     return classnames(element, className);
@@ -50,7 +68,6 @@ export function m(ele: Ele, ctx: Context): Child | undefined {
     // maybe url
     const { qId, text } = ele;
     const linkEle = docMap.get(qId);
-    console.debug({ qId, linkEle });
     if (linkEle) {
       const href = linkEle?.crt.b.u?.s || `#q-${qId}`;
       const title = linkEle?.crt.b.t?.s;

@@ -82,10 +82,10 @@ fastify.register(import('@fastify/static'), {
 });
 
 // Run the server and report out to the logs
-fastify.listen({ port: 3117, host: "0.0.0.0" }, (err, address) => {
+fastify.listen({ port: 3117, host: "localhost" }, (err, address) => {
   if (err) {
     console.error(err);
     process.exit(1);
   }
-  console.log(`Your app is listening on ${address}`);
+  console.log(`Demo is live at ${address}`);
 });

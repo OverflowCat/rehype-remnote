@@ -11,7 +11,7 @@ type ColorStr = string;
 type LinkTitle = string;
 
 type CCallout = {
-    b: VsPair<T>
+    b: VsPair<string>
 }
 
 type RightSideImage = {
@@ -227,6 +227,7 @@ type XformConfig = {
     colorMap: string[],
     debug?: boolean,
     docHook?: (tdoc: TDoc, level: number) => TDoc,
+    noCss?: boolean,
 }
 
 type Context = {
@@ -234,3 +235,6 @@ type Context = {
     /** all docs in the workspace */
     docMap: DocMap
 }
+
+/** In hAST Node */
+// type Properties = Record<string, string | undefined | boolean | number | BigInt>

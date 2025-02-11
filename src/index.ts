@@ -1,6 +1,6 @@
 import { type Child, h } from "hastscript";
 
-import { cls, m, t, mapColor } from "./item.js";
+import { cls, m, t, mapColor, wrapElementChildren } from "./item.js";
 import { groupChildren } from "./ordered.js";
 import { datanames } from "./util.js";
 import { toHtml } from "hast-util-to-html";
@@ -190,6 +190,25 @@ export function transformDoc(
   }
   if (doc.crt?.h?.c?.s && thisCard.length > 0 /* TODO */) { // add bg color
     cls(firstBlock, `bg-${mapColor(doc.crt?.h?.c?.s, 300, config.colorMap)}`, true);
+  }
+  if (doc.crt?.clo) {
+    //   let firstBlockE = firstBlock as Element;
+    //   if (firstBlockE.tagName !== "div") throw new Error("First block is not div");
+    //   // @ts-ignore
+    //   firstBlockE.tagName = "blockquote"
+    //   console.debug(firstBlockE)
+    //   cls(firstBlock, "callout")
+
+    let properties = { class: "callout", }
+    const icon = doc.crt.clo.b.s;
+    if (config.noCss === false) {
+      properties["data-callout-icon"] = icon;
+    } else {
+      node.children.unshift(h("span", { class: "callout-icon" }, icon));
+    }
+
+    // @ts-ignore
+    wrapElementChildren(node, "blockquote", properties);
   }
 
   if (typeof doc.docUpdated === "number") data.document = true;

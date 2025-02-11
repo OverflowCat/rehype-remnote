@@ -1,5 +1,7 @@
 node_modules
-./*.js
+/*.js
+/*.json
 dist
 rem*.js
 hydrated*.json
+!package.json
