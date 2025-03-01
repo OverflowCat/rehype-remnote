@@ -41,8 +41,14 @@ export function parseRems(workspace: Workspace): [TDoc, DocMap] {
   const typeMap = new Map();
   for (const doc of docs) {
     const id = doc._id;
-
     docMap.set(id, doc);
+  }
+  docTree.set(workspace.documentRemToExportId, {
+    val: docMap.get(workspace.documentRemToExportId),
+    ch: [],
+  });
+  for (const doc of docs) {
+    const id = doc._id;
     if (doc.parent) {
       const docObj = docTree.get(id);
       if (docObj) {
