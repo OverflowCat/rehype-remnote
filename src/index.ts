@@ -90,7 +90,8 @@ export function transformDoc(
     tdoc = _tdoc;
   }
   const doc = tdoc.val;
-  if (!doc?.key || (doc?.key.length === 1 && doc.key.at(0)["i"] === "q")) {
+  if (!doc?.key || (doc?.key.length === 1 && doc.key.at(0)["i"] === "q") || (doc?.key.length === 2 && doc.key.at(1)["i"] === "q")) {
+    // the first element is "contains:" or "query:" when length === 2
     return;
   }
   const { key, value, _id } = doc;

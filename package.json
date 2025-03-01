@@ -1,6 +1,6 @@
 {
   "name": "rehype-remnote",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Convert RemNote .rem JSON to rehype AST",
   "main": "server.js",
   "type": "module",
@@ -49,5 +49,13 @@
     "@types/node": "^22.13.1",
     "fastify": "^4.29.0",
     "typescript": "^5.7.3"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "@biomejs/biome"
+    ],
+    "onlyBuiltDependencies": [
+      "@biomejs/biome"
+    ]
   }
 }
