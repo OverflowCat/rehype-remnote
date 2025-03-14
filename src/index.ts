@@ -127,7 +127,7 @@ export function transformDoc(
   const children = (tdoc.ch)
     .map((x) => transformDoc(x, ctx, level + 1))
     .filter(Boolean);
-  const thisCard =
+  let thisCard =
     back?.length > 0
       ? front.concat(
         [h("span", { class: "card-arrow" }, doc.enableBackSR ? "←" : "→")],
@@ -160,9 +160,16 @@ export function transformDoc(
         folder: Boolean(doc.crt?.o?.f),
       }
       : {};
+  let tag = "div";
   // @ts-ignore
   if (doc.crt) {
     const crt = doc.crt as Crt;
+    if (crt?.r?.s?.s.startsWith("H")) {
+      console.log(crt.r.s);
+      const lv = crt.r.s.s.slice(1);
+      tag = `h${Number.parseInt(lv) + 1}`;
+      console.log(tag);
+    }
     if (crt.im?.i?.v?.length) { // right side img
       const { width, height } = crt.im.i.v[0];
       const tree = h("img.float-end.inline-block", {
@@ -178,18 +185,21 @@ export function transformDoc(
   let firstBlock: Child;
 
   if (!children.length) {
-    node = h("div", thisProps, ...thisCard);
+    node = h(tag, thisProps, ...thisCard);
     firstBlock = node;
   } else {
     const groupedChildren = groupChildren(children);
     if (level === 0 && config.unwrapRoot) {
-      node = h("div", thisProps, ...thisCard, ...groupedChildren);
+      node = h(tag, thisProps, ...thisCard, ...groupedChildren);
       firstBlock = thisCard[0];
     }
     else {
       config.debug &&
         groupedChildren.length > 1 &&
         console.log("Grouped children", groupedChildren);
+      if (tag !== "div") thisCard = [h(tag, {
+        class: "inline-block"
+      }, ...thisCard)];
       firstBlock = h("summary", thisProps, ...thisCard);
       node = h("details", { open: !doc.ic || level < config.openLevel }, [
         firstBlock,

@@ -33,8 +33,11 @@ export const cls = (element: Child, className: string, inplace = false) => {
 // red, orange, yellow, green, indigo, purple
 export function mapColor(color: string | number, saturation: number, map: string[]) {
   const m = map || DEFAULT_CONFIG.colorMap;
-  if (typeof color === "number")
+  if (typeof color === "number") {
     return color === 0 ? map[color] : `${map[color]}-${saturation}`;
+  } if (/^[A-Z]/.test(color)) {
+    return `${color.toLowerCase()}-${saturation}`;
+  }
   return `[${color}]`
 }
 

@@ -50,7 +50,11 @@ type Crt = {
     }
     clo?: CCallout
     r?: {
-        s: any;
+        s: {
+            _id: string;
+            v: { i: string, _id: string }[];
+            s: string; // "H1"
+        }
     }
     /** code */
     cd?: {
