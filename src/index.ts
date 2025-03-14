@@ -4,6 +4,8 @@ import { cls, m, t, mapColor, wrapElementChildren } from "./item.js";
 import { groupChildren } from "./ordered.js";
 import { datanames } from "./util.js";
 import { toHtml } from "hast-util-to-html";
+import { DEFAULT_CONFIG } from "./const.js";
+export { DEFAULT_CONFIG } from "./const.js";
 export type HastNode = ReturnType<typeof h>;
 
 /** Helper function for debug */
@@ -221,12 +223,6 @@ export function transformDoc(
   if (typeof doc.docUpdated === "number") data.document = true;
   return datanames(node, data);
 }
-
-export const DEFAULT_CONFIG: XformConfig = {
-  openLevel: 2,
-  colorMap: ["current", "red", "orange", "yellow", "green", "indigo", "purple"],
-  debug: false,
-};
 
 export function hydrate(workspace: Workspace) {
   const [root, docMap] = parseRems(workspace);

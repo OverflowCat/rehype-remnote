@@ -1,6 +1,7 @@
 import { classnames } from "hast-util-classnames";
 import type { Child, Properties } from "hastscript";
 import { h } from "hastscript";
+import { DEFAULT_CONFIG } from "./const.js";
 
 export const wrap = (element: Child, tagName: string) => h(tagName, {}, element);
 export function wrapElementChildren(
@@ -31,6 +32,7 @@ export const cls = (element: Child, className: string, inplace = false) => {
 
 // red, orange, yellow, green, indigo, purple
 export function mapColor(color: string | number, saturation: number, map: string[]) {
+  const m = map || DEFAULT_CONFIG.colorMap;
   if (typeof color === "number")
     return color === 0 ? map[color] : `${map[color]}-${saturation}`;
   return `[${color}]`
