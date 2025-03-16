@@ -34,7 +34,7 @@ export const cls = (element: Child, className: string, inplace = false) => {
 export function mapColor(color: string | number, saturation: number, map: string[]) {
   const m = map || DEFAULT_CONFIG.colorMap;
   if (typeof color === "number") {
-    return color === 0 ? map[color] : `${map[color]}-${saturation}`;
+    return color === 0 ? m[color] : `${m[color]}-${saturation}`;
   } if (/^[A-Z]/.test(color)) {
     return `${color.toLowerCase()}-${saturation}`;
   }
@@ -76,6 +76,9 @@ export function m(ele: Ele, ctx: Context): Child | undefined {
     if (linkEle) {
       const href = linkEle?.crt.b.u?.s || `#q-${qId}`;
       const title = linkEle?.crt.b.t?.s;
+      if (text === "") {
+        return;
+      }
       tree = h("a", { href, title }, text);
     }
   }

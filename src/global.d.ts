@@ -211,7 +211,7 @@ type Doc = ({
         lines: string[];
     };
     "ai,u"?: number;
-    ic?: boolean;
+    ic?: boolean; // open
     di: DocId[];
     ch: Doc[];
     kr: any[];
