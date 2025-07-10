@@ -134,6 +134,7 @@ export function transformDoc(
         back
       )
       : front.concat(
+        // biome-ignore lint/complexity/useLiteralKeys: may be undefined
         doc["forget"] !== undefined
           ? [h("span", { class: "card-arrow" }, "↓")]
           : []
@@ -165,10 +166,8 @@ export function transformDoc(
   if (doc.crt) {
     const crt = doc.crt as Crt;
     if (crt?.r?.s?.s.startsWith("H")) {
-      console.log(crt.r.s);
       const lv = crt.r.s.s.slice(1);
       tag = `h${Number.parseInt(lv) + 1}`;
-      console.log(tag);
     }
     if (crt.im?.i?.v?.length) { // right side img
       const { width, height } = crt.im.i.v[0];
@@ -178,6 +177,9 @@ export function transformDoc(
         height,
       });
       thisCard.unshift(tree);
+    }
+    if (doc.crt.qt) {
+      tag = "blockquote";
     }
   }
 
@@ -229,7 +231,6 @@ export function transformDoc(
     // @ts-ignore
     wrapElementChildren(node, "blockquote", properties);
   }
-
   if (typeof doc.docUpdated === "number") data.document = true;
   return datanames(node, data);
 }

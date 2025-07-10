@@ -30,11 +30,11 @@ type RightSideImage = {
 
 type Crt = {
     /** Ordered List item */
-    i?: {};
+    i?: Record<string, never>;
     /** Card item */
-    w?: {};
+    w?: Record<string, never>;
     /** Quoteblock */
-    qt?: {};
+    qt?: Record<string, never>;
     im?: RightSideImage;
     h?: {
         /** Highlight color */
@@ -140,7 +140,7 @@ type TypeDoc = {
     "rcrt,u": number,
     crt?: {
         /** Automatically Sort */
-        g?: {},
+        g?: Record<string, never>,
         /** Daily Documents */
         o?: {
             s?: any;

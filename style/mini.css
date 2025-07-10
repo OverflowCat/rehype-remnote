@@ -72,7 +72,13 @@
     text-indent: calc(-1 * var(--details-summary-indent));
 }
 
-.rem summary * {
+.rem summary::-webkit-details-marker,
+.rem summary::marker
+{ 
+  display: block;
+}
+
+.rem summary>* {
     text-indent: initial;
     /* prevent inheritance */
 }
@@ -87,7 +93,13 @@
     inset-inline-start: calc(var(--details-padding-inline, .75ch) + var(--details-marker-delta, .5ch));
     inset-block-start: var(--details-indent);
     inset-block-end: var(--details-inset-block-end);
+    border: red solid 1px;
     border-inline-start: var(--details-border-inline-start);
+}
+
+.rem blockquote {
+    border-inline-start: .2em solid #6a6a6a93;
+    padding-inline-start: var(--details-padding-inline);
 }
 
 .rem .callout {
