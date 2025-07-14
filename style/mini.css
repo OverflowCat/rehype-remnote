@@ -166,8 +166,8 @@
     display: block;
 }
 
-.rem *:has(>.link-card):hover>.link-card,
-.rem *:has(>.link-card):hover>.link-card > *,
-.rem *:has(>.link-card):hover>a.link-card-title {
+.rem *:has(>.link-card:not(:only-child)):hover>.link-card,
+.rem *:has(>.link-card:not(:only-child)):hover>.link-card > *,
+.rem *:has(>.link-card:not(:only-child)):hover>a.link-card-title {
     display: block;
 }

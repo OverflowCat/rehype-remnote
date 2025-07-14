@@ -9,8 +9,6 @@ export function wrapElementChildren(
   prepend: Child[] = [], append: Child[] = []
 ): Child {
   // @ts-expect-error
-  console.log(element.children)
-  // @ts-expect-error
   const innerElement = h(tagName, properties, element.children);
   // @ts-expect-error
   element.children = [...prepend, innerElement, ...append];
@@ -72,14 +70,21 @@ export function m(ele: Ele, ctx: Context): Child | undefined {
   } else if (ele.i === 'm') {
     // maybe url
     const { qId, text } = ele;
-    const linkEle = docMap.get(qId);
-    if (linkEle) {
-      const href = linkEle?.crt.b.u?.s || `#q-${qId}`;
-      const title = linkEle?.crt.b.t?.s;
-      if (text === "") {
-        return;
-      }
+    if (ele.iUrl) {
+      const href = ele.iUrl;
+      const title = ele.text;
       tree = h("a", { href, title }, text);
+    }
+    else {
+      const linkEle = docMap.get(qId);
+      if (linkEle) {
+        const href = linkEle?.crt.b.u?.s || `#q-${qId}`;
+        const title = linkEle?.crt.b.t?.s;
+        if (text === "") {
+          return;
+        }
+        tree = h("a", { href, title }, text);
+      }
     }
   } else if (ele.i === "u") {
     tree = ele.image && ele.url && ele.title && ele.description ? h("section", {

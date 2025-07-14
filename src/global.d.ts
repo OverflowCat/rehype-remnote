@@ -95,6 +95,7 @@ type BaseEle = { // RemNote rich text segment
     siteName?: string;
     description?: string;
     image?: string;
+    iUrl?: string;
     b?: boolean;
     l?: boolean;
     u?: boolean;
