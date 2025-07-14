@@ -90,7 +90,11 @@ type BaseEle = { // RemNote rich text segment
     /**
      * i: math
      */
-    i?: "i" | "q" | "m" | "x";
+    i?: "i" | "q" | "m" | "x" | "u";
+    title?: string;
+    siteName?: string;
+    description?: string;
+    image?: string;
     b?: boolean;
     l?: boolean;
     u?: boolean;

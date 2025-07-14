@@ -81,6 +81,16 @@ export function m(ele: Ele, ctx: Context): Child | undefined {
       }
       tree = h("a", { href, title }, text);
     }
+  } else if (ele.i === "u") {
+    tree = ele.image && ele.url && ele.title && ele.description ? h("section", {
+      className: "link-card",
+    }, [
+      h("img", { src: ele.image, width: "200", className: "inline-block float-end" }),
+      h("a", { href: ele.url, className: "link-card-title" }, h("strong", ele.title)),
+      ele.siteName && h("div", { className: "text-md" }, ele.siteName),
+      h("p", { className: "text-secondary text-sm" }, ele.description),
+    ]) : h("a", { href: ele.url, title: ele.description }, ele.title);
+    return tree;
   }
 
   if (!tree) {

@@ -1,6 +1,6 @@
 {
   "name": "rehype-remnote",
-  "version": "0.3.9",
+  "version": "0.4.0",
   "description": "Convert RemNote .rem JSON to rehype AST",
   "main": "server.js",
   "type": "module",
@@ -48,6 +48,7 @@
     "@types/hast": "^3.0.4",
     "@types/node": "^22.13.10",
     "fastify": "^4.29.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   },
   "pnpm": {

@@ -137,3 +137,37 @@
     margin-inline-start: .4ch;
     margin-inline-end: .8ch;
 }
+
+.rem .link-card img {
+    max-inline-size: min(20vi, 35%);
+}
+
+.rem .link-card {
+    border: 2px dashed var(--border-color);
+    display: inline;
+}
+
+.rem .link-card > * {
+    display: none;
+}
+
+.rem .link-card a.link-card-title {
+    display: inline;
+}
+
+.rem .link-card a.link-card-title::after {
+    content: "[预览]";
+}
+
+.rem .link-card:hover,
+.rem .link-card:hover > *,
+.rem .link-card:hover a.link-card-title
+{
+    display: block;
+}
+
+.rem *:has(>.link-card):hover>.link-card,
+.rem *:has(>.link-card):hover>.link-card > *,
+.rem *:has(>.link-card):hover>a.link-card-title {
+    display: block;
+}
