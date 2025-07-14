@@ -220,7 +220,7 @@ export function transformDoc(
     //   console.debug(firstBlockE)
     //   cls(firstBlock, "callout")
 
-    let properties = { class: "callout", }
+    const properties = { class: "callout", }
     const icon = doc.crt.clo.b.s;
     if (config.noCss === false) {
       properties["data-callout-icon"] = icon;
